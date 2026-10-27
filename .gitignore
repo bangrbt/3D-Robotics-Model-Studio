@@ -13,11 +13,50 @@ __pycache__/
 *.swp
 *.swo
 
-# Temporary / Scratch Files
+# Temporary & Cache Files
 .system_generated/
-*.asr_temp.wav
-*.converted.wav
 artifacts/
 
-# Allow 3D Results
+# Ignore Unrelated Media & Zip Archives
+*.zip
+*.wav
+*.m4a
+*.aac
+*.mp3
+
+# Ignore Unrelated Gesture, Pose & Audio Modules
+models/
+drawing_robot/
+drawing_app.py
+pose_robot/
+pose_app.py
+palm_ar.py
+preview_ar.py
+gestures.py
+vision.py
+scene3d.py
+experiments.py
+ui.py
+app.py
+speech_to_text.py
+audio_processor.py
+compare.py
+danh_gia.txt
+ket_qua.txt
+tests/
+
+# Ignore Unrelated Batch Files
+run.bat
+run_gestures.bat
+run_pose.bat
+
+# Ignore Unrelated Audio Results
+results/ChuyenDoi_Amthanh/
+results/audio_analysis/
+results/himn_analysis/
+results/commands.csv
+results/effects.csv
+
+# Keep 3D Robotics Results
 !results/3D_model_analysis/
+!results/3D_model_analysis/**

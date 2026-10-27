@@ -1,6 +1,0 @@
-Văn bản gốc: Xin chào tất cả các bạn đã đến với lớp HRI. Chúng tôi là sinh viên K68R của trường Đại học Công nghệ, Đại học Quốc gia Hà Nội.
-Văn bản nhận diện: Xin chào tất cả các bạn đã đến với lớp HRI. Chúng tôi là sinh viên K68R của trường đại học công nghệ, đại học quốc gia Hà Nội.
-S = 0
-D = 0
-I = 0
-WER = 0.00%
