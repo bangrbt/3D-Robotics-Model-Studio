@@ -1,0 +1,23 @@
+# Python & Virtual Environments
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# IDE & Editor Config
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary / Scratch Files
+.system_generated/
+*.asr_temp.wav
+*.converted.wav
+artifacts/
+
+# Allow 3D Results
+!results/3D_model_analysis/

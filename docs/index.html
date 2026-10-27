@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Robotics Model Studio — Engineering Analysis & Visualization</title>
+  <meta name="description" content="Nền tảng kỹ thuật trực quan hóa mô hình 3D tương tác, phân tích cấu trúc tô-pô, biến đổi hình học và so sánh 4 cách biểu diễn 3D cho Human-Robot Interaction.">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Three.js Libraries -->
+  <script src="libs/three.min.js"></script>
+  <script src="libs/OrbitControls.js"></script>
+  <script src="libs/STLLoader.js"></script>
+  <script src="libs/STLExporter.js"></script>
+  <script src="libs/OBJExporter.js"></script>
+  <script src="libs/PLYExporter.js"></script>
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="studio-header">
+    <div class="header-left">
+      <div class="brand-block">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+          <line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+        <div class="brand-text">
+          <span class="brand-title">3D ROBOTICS STUDIO</span>
+          <span class="brand-subtitle">CAD & Topological Analysis Platform</span>
+        </div>
+      </div>
+      <div class="model-badge">
+        <span class="status-dot"></span>
+        <span id="active-filename">grasp_quad_full_assembly_v7.STL</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="stat-pill" title="Số lượng mặt tam giác">
+        <span class="pill-label">Faces:</span>
+        <span class="pill-val" id="hdr-faces">426,500</span>
+      </div>
+      <div class="stat-pill" title="Số lượng đỉnh tọa độ">
+        <span class="pill-label">Vertices:</span>
+        <span class="pill-val" id="hdr-vertices">211,406</span>
+      </div>
+      <div class="stat-pill" title="Kích thước bao X x Y x Z">
+        <span class="pill-label">Bounds:</span>
+        <span class="pill-val" id="hdr-dims">315 × 317 × 287 mm</span>
+      </div>
+      <div class="stat-pill fps-pill">
+        <span class="pill-label">FPS:</span>
+        <span class="pill-val" id="hdr-fps">60</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <label class="btn btn-secondary btn-file" id="btn-open-file" title="Mở file 3D từ máy tính (STL, OBJ, PLY)">
+        <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Mở File</span>
+        <input type="file" id="file-input" accept=".stl,.obj,.ply" style="display:none;">
+      </label>
+
+      <button class="btn btn-secondary" id="btn-reset-view" title="Đưa camera về góc nhìn mặc định">
+        <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        <span>Reset View</span>
+      </button>
+
+      <button class="btn btn-secondary" id="btn-snapshot" title="Chụp ảnh khung nhìn 3D độ phân giải cao">
+        <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span>Chụp Ảnh</span>
+      </button>
+
+      <button class="btn btn-primary" id="btn-save-all" title="Lưu toàn bộ định dạng xuất lên ổ đĩa">
+        <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        <span>Lưu Kết Quả</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="studio-container">
+    <!-- Left Sidebar: Representations & Visual Settings -->
+    <aside class="sidebar sidebar-left" id="panel-left">
+      <!-- Section 1: 3D Representations -->
+      <div class="panel-card">
+        <div class="card-header">
+          <svg class="card-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+          <h2 class="card-title">Cách Biểu Diễn 3D</h2>
+        </div>
+        <div class="card-body">
+          <div class="rep-selector-grid">
+            <button class="rep-btn active" data-rep="mesh" id="rep-mesh" title="Lưới đa giác tam giác liên tục">
+              <svg class="rep-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                <line x1="12" y1="2" x2="12" y2="22"/>
+                <line x1="2" y1="8.5" x2="22" y2="15.5"/>
+              </svg>
+              <span class="rep-name">Polygon Mesh</span>
+              <span class="rep-sub">Mặt đa giác</span>
+            </button>
+
+            <button class="rep-btn" data-rep="pointcloud" id="rep-pointcloud" title="Đám mây điểm hạt rời rạc">
+              <svg class="rep-svg" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
+                <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                <circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
+              </svg>
+              <span class="rep-name">Point Cloud</span>
+              <span class="rep-sub">Đám mây điểm</span>
+            </button>
+
+            <button class="rep-btn" data-rep="voxel" id="rep-voxel" title="Mạng lưới thể tích 3D occupancy">
+              <svg class="rep-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="8" height="8" rx="1"/>
+                <rect x="13" y="3" width="8" height="8" rx="1"/>
+                <rect x="3" y="13" width="8" height="8" rx="1"/>
+                <rect x="13" y="13" width="8" height="8" rx="1"/>
+              </svg>
+              <span class="rep-name">Voxel Grid</span>
+              <span class="rep-sub" id="voxel-sub-text">1,387 khối</span>
+            </button>
+
+            <button class="rep-btn" data-rep="wireframe" id="rep-wireframe" title="Khung dây liên kết cạnh">
+              <svg class="rep-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/>
+                <circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/>
+                <line x1="9" y1="6" x2="15" y2="6"/>
+                <line x1="6" y1="9" x2="6" y2="15"/>
+                <line x1="18" y1="9" x2="18" y2="15"/>
+                <line x1="9" y1="18" x2="15" y2="18"/>
+                <line x1="8.1" y1="8.1" x2="15.9" y2="15.9"/>
+              </svg>
+              <span class="rep-name">Wireframe</span>
+              <span class="rep-sub">Khung xương</span>
+            </button>
+          </div>
+
+          <button class="btn btn-compare w-100" id="btn-toggle-split-view">
+            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="12" y1="3" x2="12" y2="21"/>
+            </svg>
+            <span>Bảng So Sánh 4 Dạng Biểu Diễn</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2: Material & Shading -->
+      <div class="panel-card" id="mesh-controls-group">
+        <div class="card-header">
+          <svg class="card-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <h2 class="card-title">Vật Liệu & Ánh Sáng</h2>
+        </div>
+        <div class="card-body">
+          <div class="control-row">
+            <label for="mat-style-select">Kiểu đổ bóng bề mặt:</label>
+            <select id="mat-style-select" class="select-input">
+              <option value="metallic" selected>Titanium Studio (Kim loại PBR)</option>
+              <option value="heatmap">Z-Elevation Heatmap (Phân tầng độ cao)</option>
+              <option value="normals">Normal Vectors (Pháp tuyến RGB)</option>
+              <option value="matte">Matte Engineering (Đơn sắc xám mờ)</option>
+            </select>
+          </div>
+
+          <div class="control-row checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="chk-wire-overlay">
+              <span>Hiển thị đè khung lưới (Wireframe overlay)</span>
+            </label>
+          </div>
+
+          <div class="control-row checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="chk-flat-shading">
+              <span>Đổ bóng đa giác phẳng (Flat Shading)</span>
+            </label>
+          </div>
+
+          <div class="control-row">
+            <div class="label-with-val">
+              <span>Độ phản kim loại (Metalness):</span>
+              <span id="val-metalness">0.75</span>
+            </div>
+            <input type="range" id="rng-metalness" min="0" max="1" step="0.05" value="0.75">
+          </div>
+
+          <div class="control-row">
+            <div class="label-with-val">
+              <span>Độ nhám bề mặt (Roughness):</span>
+              <span id="val-roughness">0.35</span>
+            </div>
+            <input type="range" id="rng-roughness" min="0" max="1" step="0.05" value="0.35">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Point Cloud & Voxel Parameters -->
+      <div class="panel-card" id="point-voxel-controls-group">
+        <div class="card-header">
+          <svg class="card-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <h2 class="card-title">Tham Số Điểm & Voxel</h2>
+        </div>
+        <div class="card-body">
+          <div class="control-row" id="grp-point-size">
+            <div class="label-with-val">
+              <span>Kích thước điểm (Point Size):</span>
+              <span id="val-point-size">2.0 px</span>
+            </div>
+            <input type="range" id="rng-point-size" min="1" max="6" step="0.5" value="2.0">
+          </div>
+
+          <div class="control-row" id="grp-voxel-pitch">
+            <div class="label-with-val">
+              <span>Độ phân giải Voxel (Pitch):</span>
+              <span id="val-voxel-pitch">12 mm</span>
+            </div>
+            <input type="range" id="rng-voxel-pitch" min="6" max="25" step="1" value="12">
+            <div class="helper-text">Pitch càng nhỏ độ chính xác biên càng cao.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Cross-Section Slicer -->
+      <div class="panel-card">
+        <div class="card-header">
+          <svg class="card-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+          <h2 class="card-title">Mặt Cắt Ruột (Section Slicer)</h2>
+        </div>
+        <div class="card-body">
+          <div class="control-row checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="chk-slice-enable">
+              <span>Kích hoạt mặt cắt phẳng quan sát kết cấu</span>
+            </label>
+          </div>
+          <div class="control-row" id="grp-slice-axis">
+            <label>Trục cắt:</label>
+            <div class="btn-group-axis">
+              <button class="btn-axis active" data-axis="x">Trục X</button>
+              <button class="btn-axis" data-axis="y">Trục Y</button>
+              <button class="btn-axis" data-axis="z">Trục Z</button>
+            </div>
+          </div>
+          <div class="control-row" id="grp-slice-pos">
+            <div class="label-with-val">
+              <span>Tọa độ vị trí cắt:</span>
+              <span id="val-slice-pos">0 mm</span>
+            </div>
+            <input type="range" id="rng-slice-pos" min="-180" max="180" step="1" value="0">
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Central 3D Viewport -->
+    <section class="viewport-section" id="viewport-container">
+      <div id="canvas-3d-wrapper">
+        <canvas id="canvas-3d"></canvas>
+      </div>
+
+      <!-- Viewport Toolbar Overlay -->
+      <div class="viewport-toolbar top-toolbar">
+        <div class="toolbar-group">
+          <span class="toolbar-label">Góc nhìn:</span>
+          <button class="tool-btn" id="cam-iso">Isometric</button>
+          <button class="tool-btn" id="cam-front">Front</button>
+          <button class="tool-btn" id="cam-top">Top</button>
+          <button class="tool-btn" id="cam-right">Right</button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+          <button class="tool-btn active" id="btn-toggle-grid">Sàn Lưới</button>
+          <button class="tool-btn active" id="btn-toggle-axes">Trục XYZ</button>
+          <button class="tool-btn active" id="btn-toggle-bbox">Hộp Bao</button>
+          <button class="tool-btn" id="btn-auto-rotate">Tự Xoay</button>
+        </div>
+      </div>
+
+      <!-- Bottom HUD -->
+      <div class="viewport-hud-bottom">
+        <div class="hud-item" id="hud-camera-info">Camera: Orbit Active</div>
+        <div class="hud-item" id="hud-coord-info">Target: [0.0, 0.0, 0.0] mm</div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner-box">
+          <div class="studio-spinner"></div>
+          <div class="loading-title">ĐANG NẠP MÔ HÌNH 3D</div>
+          <div class="loading-sub" id="loading-progress-text">Đang xử lý 426,500 tam giác...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Sidebar: Analysis, Transforms, Comparison, Export -->
+    <aside class="sidebar sidebar-right" id="panel-right">
+      <!-- Tabs Nav -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tab-structure" id="tab-nav-structure">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>Cấu Trúc</span>
+        </button>
+
+        <button class="tab-btn" data-tab="tab-transform" id="tab-nav-transform">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="21" x2="4" y2="14"/>
+            <line x1="4" y1="10" x2="4" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12" y2="3"/>
+            <line x1="20" y1="21" x2="20" y2="16"/>
+            <line x1="20" y1="12" x2="20" y2="3"/>
+            <line x1="1" y1="14" x2="7" y2="14"/>
+            <line x1="9" y1="8" x2="15" y2="8"/>
+            <line x1="17" y1="16" x2="23" y2="16"/>
+          </svg>
+          <span>Biến Đổi</span>
+        </button>
+
+        <button class="tab-btn" data-tab="tab-compare" id="tab-nav-compare">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 3h5v5"/>
+            <path d="M4 20L21 3"/>
+            <path d="M21 16v5h-5"/>
+            <path d="M15 15l6 6"/>
+            <path d="M4 4l5 5"/>
+          </svg>
+          <span>So Sánh</span>
+        </button>
+
+        <button class="tab-btn" data-tab="tab-export" id="tab-nav-export">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Xuất File</span>
+        </button>
+      </div>
+
+      <!-- Tab Content 1: Structure Analysis -->
+      <div class="tab-pane active" id="tab-structure">
+        <div class="panel-card">
+          <div class="card-header">
+            <h2 class="card-title">Chỉ Số Hình Học & Tô-Pô</h2>
+          </div>
+          <div class="card-body">
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="metric-num text-primary" id="m-faces">426,500</span>
+                <span class="metric-lbl">Mặt đa giác (Faces)</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-num text-slate" id="m-vertices">211,406</span>
+                <span class="metric-lbl">Đỉnh tọa độ (Vertices)</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-num text-slate" id="m-area">3,016.1</span>
+                <span class="metric-lbl">Diện tích bề mặt (cm²)</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-num text-slate" id="m-volume">13.29</span>
+                <span class="metric-lbl">Thể tích vỏ lồi (Lít)</span>
+              </div>
+            </div>
+
+            <div class="data-table-section">
+              <div class="section-subtitle">Kích Thước Hộp Bao (Bounding Box)</div>
+              <table class="spec-table">
+                <tr><td>Chiều rộng (X):</td><td class="text-right font-mono" id="tb-dim-x">315.06 mm</td></tr>
+                <tr><td>Chiều sâu (Y):</td><td class="text-right font-mono" id="tb-dim-y">316.72 mm</td></tr>
+                <tr><td>Chiều cao (Z):</td><td class="text-right font-mono" id="tb-dim-z">286.69 mm</td></tr>
+                <tr><td>Đường chéo bao:</td><td class="text-right font-mono" id="tb-dim-diag">531.02 mm</td></tr>
+                <tr><td>Tâm hình học:</td><td class="text-right font-mono" id="tb-centroid">[13.6, -52.1, 0.7]</td></tr>
+                <tr><td>Tính khép kín:</td><td class="text-right" id="tb-watertight">Lắp ghép cơ khí đa thân</td></tr>
+              </table>
+            </div>
+
+            <!-- Histogram Chart -->
+            <div class="histogram-section">
+              <div class="section-subtitle">Phân Bố Cao Độ Đỉnh (Z-Profile)</div>
+              <div class="canvas-chart-box">
+                <canvas id="hist-canvas" width="280" height="110"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 2: Geometric Transforms -->
+      <div class="tab-pane" id="tab-transform">
+        <div class="panel-card">
+          <div class="card-header">
+            <h2 class="card-title">Phép Toán Biến Đổi Không Gian</h2>
+          </div>
+          <div class="card-body">
+            <!-- Preset Actions -->
+            <div class="transform-actions-grid">
+              <button class="btn btn-action" id="btn-action-center" title="Đưa tâm hình học về gốc tọa độ (0,0,0)">
+                <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="22" y1="12" x2="18" y2="12"/>
+                  <line x1="6" y1="12" x2="2" y2="12"/>
+                  <line x1="12" y1="6" x2="12" y2="2"/>
+                  <line x1="12" y1="22" x2="12" y2="18"/>
+                </svg>
+                <span>Căn Tâm (0,0,0)</span>
+              </button>
+
+              <button class="btn btn-action" id="btn-action-normalize" title="Chuẩn hóa vừa vặn hộp chuẩn 200mm">
+                <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 3h6v6"/>
+                  <path d="M9 21H3v-6"/>
+                  <path d="M21 3l-7 7"/>
+                  <path d="M3 21l7-7"/>
+                </svg>
+                <span>Chuẩn Hóa Box</span>
+              </button>
+
+              <button class="btn btn-action" id="btn-action-noise" title="Thêm nhiễu ngẫu nhiên Gaussian lên tọa độ đỉnh">
+                <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <span>Thêm Nhiễu</span>
+              </button>
+
+              <button class="btn btn-action btn-danger" id="btn-action-reset-transform" title="Khôi phục trạng thái mô hình gốc">
+                <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"/>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                </svg>
+                <span>Khôi Phục Gốc</span>
+              </button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Translation -->
+            <div class="transform-group">
+              <div class="group-title">Tịnh Tiến (Translation - mm)</div>
+              <div class="slider-row">
+                <span class="axis-tag tag-x">X</span>
+                <input type="range" id="tr-x" min="-150" max="150" value="0" step="1">
+                <input type="number" id="num-tr-x" value="0" class="num-box">
+              </div>
+              <div class="slider-row">
+                <span class="axis-tag tag-y">Y</span>
+                <input type="range" id="tr-y" min="-150" max="150" value="0" step="1">
+                <input type="number" id="num-tr-y" value="0" class="num-box">
+              </div>
+              <div class="slider-row">
+                <span class="axis-tag tag-z">Z</span>
+                <input type="range" id="tr-z" min="-150" max="150" value="0" step="1">
+                <input type="number" id="num-tr-z" value="0" class="num-box">
+              </div>
+            </div>
+
+            <!-- Rotation -->
+            <div class="transform-group">
+              <div class="group-title">Phép Quay (Rotation - độ)</div>
+              <div class="slider-row">
+                <span class="axis-tag tag-x">Rx</span>
+                <input type="range" id="rot-x" min="-180" max="180" value="0" step="1">
+                <input type="number" id="num-rot-x" value="0" class="num-box">
+              </div>
+              <div class="slider-row">
+                <span class="axis-tag tag-y">Ry</span>
+                <input type="range" id="rot-y" min="-180" max="180" value="0" step="1">
+                <input type="number" id="num-rot-y" value="0" class="num-box">
+              </div>
+              <div class="slider-row">
+                <span class="axis-tag tag-z">Rz</span>
+                <input type="range" id="rot-z" min="-180" max="180" value="0" step="1">
+                <input type="number" id="num-rot-z" value="0" class="num-box">
+              </div>
+            </div>
+
+            <!-- Scale -->
+            <div class="transform-group">
+              <div class="group-title">Co Giãn Tỉ Lệ (Scale)</div>
+              <div class="slider-row">
+                <span class="axis-tag tag-all">Scale</span>
+                <input type="range" id="scale-all" min="0.1" max="3.0" value="1.0" step="0.05">
+                <input type="number" id="num-scale-all" value="1.0" step="0.05" class="num-box">
+              </div>
+            </div>
+
+            <!-- Transform Status Readout -->
+            <div class="transform-status-box" id="transform-status-text">
+              Vị trí: [0, 0, 0] mm | Xoay: [0°, 0°, 0°] | Tỉ lệ: 1.00x
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 3: Comparison -->
+      <div class="tab-pane" id="tab-compare">
+        <div class="panel-card">
+          <div class="card-header">
+            <h2 class="card-title">So Sánh 4 Cách Biểu Diễn 3D</h2>
+          </div>
+          <div class="card-body">
+            <p class="desc-text">
+              Phân tích tính liên tục, bộ nhớ và vai trò thực tế trong <strong>Human-Robot Interaction (HRI)</strong>:
+            </p>
+
+            <div class="comparison-cards-list" id="comparison-cards-container">
+              <!-- Dynamically populated or static fallback -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 4: Export -->
+      <div class="tab-pane" id="tab-export">
+        <div class="panel-card">
+          <div class="card-header">
+            <h2 class="card-title">Xuất Dữ Liệu & Báo Cáo</h2>
+          </div>
+          <div class="card-body">
+            <p class="desc-text">
+              Xuất trực tiếp mô hình sau biến đổi từ trình duyệt hoặc lưu vào máy chủ:
+            </p>
+
+            <div class="export-buttons-stack">
+              <button class="btn btn-export" id="btn-export-stl">
+                <div class="btn-exp-icon-box">
+                  <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  </svg>
+                </div>
+                <div class="btn-exp-text">
+                  <span class="btn-exp-title">Tải File STL (.stl)</span>
+                  <span class="btn-exp-sub">Lưới tam giác binary tiêu chuẩn CAD & In 3D</span>
+                </div>
+              </button>
+
+              <button class="btn btn-export" id="btn-export-obj">
+                <div class="btn-exp-icon-box">
+                  <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                </div>
+                <div class="btn-exp-text">
+                  <span class="btn-exp-title">Tải File Wavefront OBJ (.obj)</span>
+                  <span class="btn-exp-sub">Đa giác đa dụng kèm vector pháp tuyến đỉnh</span>
+                </div>
+              </button>
+
+              <button class="btn btn-export" id="btn-export-ply">
+                <div class="btn-exp-icon-box">
+                  <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="4"/>
+                  </svg>
+                </div>
+                <div class="btn-exp-text">
+                  <span class="btn-exp-title">Tải Point Cloud PLY (.ply)</span>
+                  <span class="btn-exp-sub">Đám mây điểm kèm màu sắc gradient cao độ</span>
+                </div>
+              </button>
+
+              <button class="btn btn-export" id="btn-export-json">
+                <div class="btn-exp-icon-box">
+                  <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"/>
+                    <polyline points="8 6 2 12 8 18"/>
+                  </svg>
+                </div>
+                <div class="btn-exp-text">
+                  <span class="btn-exp-title">Tải Báo Cáo JSON (.json)</span>
+                  <span class="btn-exp-sub">Toàn bộ thông số cấu trúc, bounding box, diện tích</span>
+                </div>
+              </button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="save-folder-box">
+              <div class="folder-title">Thư mục kết quả tự động:</div>
+              <div class="folder-path"><code>results/3D_model_analysis/</code></div>
+              <button class="btn btn-primary w-100 mt-2" id="btn-save-server-disk">
+                <span>Lưu Toàn Bộ 6 Định Dạng Vào Thư Mục</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Notification Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>

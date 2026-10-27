@@ -1,0 +1,59 @@
+{
+  "comparison": [
+    {
+      "representation": "Polygon Mesh (Lưới đa giác tam giác)",
+      "type": "Surface Continuous (Bề mặt liên tục)",
+      "elements_name": "Tam giác (Faces)",
+      "elements_count": 426500,
+      "memory_kb": 24947.0,
+      "memory_mb": 24.36,
+      "continuity": "Liên tục, có thông tin topo & hướng pháp tuyến (Manifold/Surface)",
+      "render_complexity": "O(F) - Tối ưu cực tốt nhờ GPU Vertex/Fragment Shaders phần cứng",
+      "hri_robotics_use_case": "Mô hình CAD tay máy (Robot Gripper), va chạm động học Kinematics, mô phỏng vật lý PyBullet/MuJoCo, in 3D"
+    },
+    {
+      "representation": "Point Cloud (Đám mây điểm)",
+      "type": "Discrete Unorganized (Rời rạc không cấu trúc)",
+      "elements_name": "Điểm 3D (Points + Normals)",
+      "elements_count": 25000,
+      "memory_kb": 1171.9,
+      "memory_mb": 1.14,
+      "continuity": "Rời rạc, không có liên kết mặt, nhạy với nhiễu khoảng cách",
+      "render_complexity": "O(N) - Render điểm hạt (Points/Particles), siêu nhẹ khi xử lý song song",
+      "hri_robotics_use_case": "Dữ liệu thô từ cảm biến RGB-D Realsense/Kinect, quét LiDAR xe tự hành, thuật toán đăng ký ICP (Iterative Closest Point), nhận dạng cử chỉ tay 3D"
+    },
+    {
+      "representation": "Voxel Grid (Mạng lưới thể tích 3D)",
+      "type": "Volumetric Occupancy (Thể tích không gian)",
+      "elements_name": "Khối Voxel (Occupied Cubes)",
+      "elements_count": 1387,
+      "memory_kb": 34.8,
+      "memory_mb": 0.03,
+      "continuity": "Rời rạc theo lưới đều (Regular grid), độ phân giải phụ thuộc bước pitch",
+      "render_complexity": "O(V) - Có thể tối ưu bằng InstancedMesh hoặc Octree/SDF",
+      "hri_robotics_use_case": "Bản đồ 3D tránh vật cản (OctoMap), lập quỹ đạo chuyển động tay máy (MoveIt/OMPL), mạng nơ-ron học sâu 3D (3D CNN/VoxNet)"
+    },
+    {
+      "representation": "Wireframe (Khung dây / Edge Graph)",
+      "type": "Topological Graph (Đồ thị cạnh)",
+      "elements_name": "Đoạn thẳng (Edges)",
+      "elements_count": 638616,
+      "memory_kb": 14933.2,
+      "memory_mb": 14.58,
+      "continuity": "Cấu trúc cạnh khung xương, không có bề mặt che khuất",
+      "render_complexity": "O(E) - Vẽ đường thẳng LineSegments, nhẹ nhàng cho CPU/low-spec devices",
+      "hri_robotics_use_case": "Quan sát cấu trúc khung cơ khí tay gắp robot, hiển thị AR mờ đè lên camera thời gian thực, phân tích phần tử hữu hạn (FEA)"
+    }
+  ],
+  "voxel_params": {
+    "pitch_mm": 12.0,
+    "grid_shape": [
+      28,
+      27,
+      25
+    ]
+  },
+  "point_cloud_params": {
+    "sampled_count": 25000
+  }
+}

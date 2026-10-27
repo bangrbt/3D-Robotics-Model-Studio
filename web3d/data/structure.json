@@ -1,0 +1,96 @@
+{
+  "file_info": {
+    "filename": "grasp_quad_full_assembly_v7.STL",
+    "file_size_bytes": 21325084,
+    "file_size_mb": 20.34,
+    "format": "STL"
+  },
+  "mesh_counts": {
+    "faces": 426500,
+    "vertices": 211406,
+    "edges_unique": 638616,
+    "edges_total": 1279500,
+    "euler_characteristic": -710
+  },
+  "bounding_box": {
+    "min": [
+      -139.75,
+      -233.3,
+      -143.35
+    ],
+    "max": [
+      175.31,
+      83.42,
+      143.35
+    ],
+    "dimensions_mm": {
+      "width_x": 315.06,
+      "depth_y": 316.72,
+      "height_z": 286.69
+    },
+    "diagonal_length_mm": 530.82,
+    "centroid": [
+      13.6,
+      -52.13,
+      0.73
+    ]
+  },
+  "geometric_properties": {
+    "surface_area_mm2": 301610.49,
+    "surface_area_cm2": 3016.1,
+    "triangle_area_stats_mm2": {
+      "min_mm2": 2.4283828731862774e-09,
+      "max_mm2": 1528.2000664901734,
+      "mean_mm2": 0.7071758208465443,
+      "std_mm2": 8.944532349647584
+    },
+    "mesh_density_tri_per_cm2": 141.4,
+    "is_watertight": false,
+    "is_convex": false,
+    "mesh_volume_cm3": null,
+    "convex_hull_volume_cm3": 13289.08,
+    "compactness": 12.464
+  },
+  "z_distribution": [
+    {
+      "range": "[-143.3, -114.7]",
+      "count": 1531
+    },
+    {
+      "range": "[-114.7, -86.0]",
+      "count": 11526
+    },
+    {
+      "range": "[-86.0, -57.3]",
+      "count": 19993
+    },
+    {
+      "range": "[-57.3, -28.7]",
+      "count": 46389
+    },
+    {
+      "range": "[-28.7, 0.0]",
+      "count": 24056
+    },
+    {
+      "range": "[0.0, 28.7]",
+      "count": 23813
+    },
+    {
+      "range": "[28.7, 57.3]",
+      "count": 50366
+    },
+    {
+      "range": "[57.3, 86.0]",
+      "count": 20671
+    },
+    {
+      "range": "[86.0, 114.7]",
+      "count": 11530
+    },
+    {
+      "range": "[114.7, 143.3]",
+      "count": 1531
+    }
+  ]
+}

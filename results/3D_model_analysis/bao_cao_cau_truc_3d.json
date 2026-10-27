@@ -1,0 +1,179 @@
+{
+  "title": "Báo Cáo Phân Tích Mô Hình 3D & So Sánh Cách Biểu Diễn",
+  "timestamp": "2026-10-28 04:26:42",
+  "structure_analysis": {
+    "file_info": {
+      "filename": "grasp_quad_full_assembly_v7.STL",
+      "file_size_bytes": 21325084,
+      "file_size_mb": 20.34,
+      "format": "STL"
+    },
+    "mesh_counts": {
+      "faces": 426500,
+      "vertices": 211406,
+      "edges_unique": 638616,
+      "edges_total": 1279500,
+      "euler_characteristic": -710
+    },
+    "bounding_box": {
+      "min": [
+        -140.52,
+        -85.8,
+        -114.68
+      ],
+      "max": [
+        133.63,
+        116.36,
+        114.68
+      ],
+      "dimensions_mm": {
+        "width_x": 274.14,
+        "depth_y": 202.17,
+        "height_z": 229.36
+      },
+      "diagonal_length_mm": 410.65,
+      "centroid": [
+        -12.02,
+        14.13,
+        0.58
+      ]
+    },
+    "geometric_properties": {
+      "surface_area_mm2": 193030.71,
+      "surface_area_cm2": 1930.31,
+      "triangle_area_stats_mm2": {
+        "min_mm2": 1.5541645376265906e-09,
+        "max_mm2": 978.0480425537112,
+        "mean_mm2": 0.45259252534178834,
+        "std_mm2": 5.724500703774455
+      },
+      "mesh_density_tri_per_cm2": 220.9,
+      "is_watertight": false,
+      "is_convex": false,
+      "mesh_volume_cm3": null,
+      "convex_hull_volume_cm3": 6804.01,
+      "compactness": 12.464
+    },
+    "z_distribution": [
+      {
+        "range": "[-114.7, -91.7]",
+        "count": 1531
+      },
+      {
+        "range": "[-91.7, -68.8]",
+        "count": 11526
+      },
+      {
+        "range": "[-68.8, -45.9]",
+        "count": 19993
+      },
+      {
+        "range": "[-45.9, -22.9]",
+        "count": 46389
+      },
+      {
+        "range": "[-22.9, 0.0]",
+        "count": 24056
+      },
+      {
+        "range": "[0.0, 22.9]",
+        "count": 23813
+      },
+      {
+        "range": "[22.9, 45.9]",
+        "count": 50366
+      },
+      {
+        "range": "[45.9, 68.8]",
+        "count": 20671
+      },
+      {
+        "range": "[68.8, 91.7]",
+        "count": 11530
+      },
+      {
+        "range": "[91.7, 114.7]",
+        "count": 1531
+      }
+    ]
+  },
+  "representations_comparison": {
+    "comparison": [
+      {
+        "representation": "Polygon Mesh (Lưới đa giác tam giác)",
+        "type": "Surface Continuous (Bề mặt liên tục)",
+        "elements_name": "Tam giác (Faces)",
+        "elements_count": 426500,
+        "memory_kb": 24947.0,
+        "memory_mb": 24.36,
+        "continuity": "Liên tục, có thông tin topo & hướng pháp tuyến (Manifold/Surface)",
+        "render_complexity": "O(F) - Tối ưu cực tốt nhờ GPU Vertex/Fragment Shaders phần cứng",
+        "hri_robotics_use_case": "Mô hình CAD tay máy (Robot Gripper), va chạm động học Kinematics, mô phỏng vật lý PyBullet/MuJoCo, in 3D"
+      },
+      {
+        "representation": "Point Cloud (Đám mây điểm)",
+        "type": "Discrete Unorganized (Rời rạc không cấu trúc)",
+        "elements_name": "Điểm 3D (Points + Normals)",
+        "elements_count": 25000,
+        "memory_kb": 1171.9,
+        "memory_mb": 1.14,
+        "continuity": "Rời rạc, không có liên kết mặt, nhạy với nhiễu khoảng cách",
+        "render_complexity": "O(N) - Render điểm hạt (Points/Particles), siêu nhẹ khi xử lý song song",
+        "hri_robotics_use_case": "Dữ liệu thô từ cảm biến RGB-D Realsense/Kinect, quét LiDAR xe tự hành, thuật toán đăng ký ICP (Iterative Closest Point), nhận dạng cử chỉ tay 3D"
+      },
+      {
+        "representation": "Voxel Grid (Mạng lưới thể tích 3D)",
+        "type": "Volumetric Occupancy (Thể tích không gian)",
+        "elements_name": "Khối Voxel (Occupied Cubes)",
+        "elements_count": 2078,
+        "memory_kb": 52.1,
+        "memory_mb": 0.05,
+        "continuity": "Rời rạc theo lưới đều (Regular grid), độ phân giải phụ thuộc bước pitch",
+        "render_complexity": "O(V) - Có thể tối ưu bằng InstancedMesh hoặc Octree/SDF",
+        "hri_robotics_use_case": "Bản đồ 3D tránh vật cản (OctoMap), lập quỹ đạo chuyển động tay máy (MoveIt/OMPL), mạng nơ-ron học sâu 3D (3D CNN/VoxNet)"
+      },
+      {
+        "representation": "Wireframe (Khung dây / Edge Graph)",
+        "type": "Topological Graph (Đồ thị cạnh)",
+        "elements_name": "Đoạn thẳng (Edges)",
+        "elements_count": 638616,
+        "memory_kb": 14933.2,
+        "memory_mb": 14.58,
+        "continuity": "Cấu trúc cạnh khung xương, không có bề mặt che khuất",
+        "render_complexity": "O(E) - Vẽ đường thẳng LineSegments, nhẹ nhàng cho CPU/low-spec devices",
+        "hri_robotics_use_case": "Quan sát cấu trúc khung cơ khí tay gắp robot, hiển thị AR mờ đè lên camera thời gian thực, phân tích phần tử hữu hạn (FEA)"
+      }
+    ],
+    "voxel_params": {
+      "pitch_mm": 8.0,
+      "grid_shape": [
+        36,
+        27,
+        29
+      ]
+    },
+    "point_cloud_params": {
+      "sampled_count": 25000
+    }
+  },
+  "transform_history": [
+    {
+      "centered": true,
+      "offset_removed": [
+        17.776535034179688,
+        -74.93679428100586,
+        0.0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "rotation_deg": [
+        0,
+        0,
+        30
+      ]
+    }
+  ]
+}
